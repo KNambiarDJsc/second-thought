@@ -18,13 +18,39 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install
-        run: pip install -e ".[dev]" scikit-learn numpy
+        run: pip install -e ".[dev]"
       - name: Ruff
         run: ruff check src/ tests/ examples/
       - name: Mypy
         run: mypy src/second_thought
       - name: Pytest
         run: pytest -q
+
+  minimal-install:
+    # Regression check for the packaging gap: second_thought.experiments
+    # ships in the installed package and must stay importable on a bare
+    # `pip install second-thought`, with no extras, no numpy, no
+    # scikit-learn present at all.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install with no extras
+        run: pip install -e .
+      - name: Import the full package, including experiments, with no numpy/sklearn installed
+        run: python -c "import second_thought; import second_thought.experiments"
+      - name: run_experiment() itself should fail with an actionable error, not a bare ModuleNotFoundError
+        run: |
+          python -c "
+          from second_thought.experiments import run_experiment
+          try:
+              run_experiment(None, None, None, None)
+              raise AssertionError('expected ImportError')
+          except ImportError as exc:
+              assert 'pip install second-thought[experiments]' in str(exc), exc
+          "
 
   toy-experiment:
     runs-on: ubuntu-latest
@@ -34,7 +60,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install
-        run: pip install -e . scikit-learn numpy
+        run: pip install -e ".[experiments]"
       - name: Run the core hypothesis experiment
         run: python examples/toy_typed_decisions/run.py
 
@@ -46,7 +72,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install
-        run: pip install -e . scikit-learn numpy
+        run: pip install -e ".[experiments]"
       - name: Run the non-Laya, non-Jev provider example
         run: python run.py
         working-directory: examples/generic_provider

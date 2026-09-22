@@ -18,8 +18,8 @@
       "round": 0,
       "n_labels": 30,
       "test_accuracy": 0.5,
-      "test_mean_brier": 0.6858421178792917,
-      "test_ece": 0.19813899975105193
+      "test_mean_brier": 0.6858421178792916,
+      "test_ece": 0.19813899975105198
     },
     {
       "strategy": "random",
@@ -27,14 +27,14 @@
       "n_labels": 35,
       "test_accuracy": 0.518,
       "test_mean_brier": 0.6622451488610334,
-      "test_ece": 0.18663869200770813
+      "test_ece": 0.1866386920077082
     },
     {
       "strategy": "random",
       "round": 2,
       "n_labels": 40,
       "test_accuracy": 0.498,
-      "test_mean_brier": 0.7054253992105253,
+      "test_mean_brier": 0.7054253992105248,
       "test_ece": 0.21689017996168392
     },
     {
@@ -42,8 +42,8 @@
       "round": 3,
       "n_labels": 45,
       "test_accuracy": 0.504,
-      "test_mean_brier": 0.693575892315859,
-      "test_ece": 0.21525002009945932
+      "test_mean_brier": 0.6935758923158597,
+      "test_ece": 0.21525002009945937
     },
     {
       "strategy": "random",
@@ -51,38 +51,38 @@
       "n_labels": 50,
       "test_accuracy": 0.476,
       "test_mean_brier": 0.746648031641995,
-      "test_ece": 0.2560518658219623
+      "test_ece": 0.2560518658219624
     },
     {
       "strategy": "random",
       "round": 5,
       "n_labels": 55,
       "test_accuracy": 0.5,
-      "test_mean_brier": 0.7091477404923432,
-      "test_ece": 0.23584377882109553
+      "test_mean_brier": 0.7091477404923434,
+      "test_ece": 0.2358437788210955
     },
     {
       "strategy": "random",
       "round": 6,
       "n_labels": 60,
       "test_accuracy": 0.494,
-      "test_mean_brier": 0.7380441773131465,
-      "test_ece": 0.24402200564025234
+      "test_mean_brier": 0.7380441773131466,
+      "test_ece": 0.2440220056402523
     },
     {
       "strategy": "random",
       "round": 7,
       "n_labels": 65,
       "test_accuracy": 0.516,
-      "test_mean_brier": 0.7369375462618996,
-      "test_ece": 0.2564437088875866
+      "test_mean_brier": 0.7369375462618989,
+      "test_ece": 0.25644370888758644
     },
     {
       "strategy": "random",
       "round": 8,
       "n_labels": 70,
       "test_accuracy": 0.49,
-      "test_mean_brier": 0.7555726356033894,
+      "test_mean_brier": 0.7555726356033897,
       "test_ece": 0.26373594378474774
     },
     {
@@ -90,47 +90,47 @@
       "round": 9,
       "n_labels": 75,
       "test_accuracy": 0.494,
-      "test_mean_brier": 0.7402558096112953,
-      "test_ece": 0.2573834304527314
+      "test_mean_brier": 0.7402558096112954,
+      "test_ece": 0.25738343045273143
     },
     {
       "strategy": "random",
       "round": 10,
       "n_labels": 80,
       "test_accuracy": 0.514,
-      "test_mean_brier": 0.715649968405967,
-      "test_ece": 0.23866050733191704
+      "test_mean_brier": 0.7156499684059668,
+      "test_ece": 0.2386605073319169
     },
     {
       "strategy": "random",
       "round": 11,
       "n_labels": 85,
       "test_accuracy": 0.516,
-      "test_mean_brier": 0.7175991056568308,
-      "test_ece": 0.24435286664236244
+      "test_mean_brier": 0.7175991056568307,
+      "test_ece": 0.24435286664236253
     },
     {
       "strategy": "random",
       "round": 12,
       "n_labels": 90,
       "test_accuracy": 0.534,
-      "test_mean_brier": 0.670101111865197,
-      "test_ece": 0.1986799683755621
+      "test_mean_brier": 0.6701011118651973,
+      "test_ece": 0.19867996837556207
     },
     {
       "strategy": "random",
       "round": 13,
       "n_labels": 95,
       "test_accuracy": 0.546,
-      "test_mean_brier": 0.6509972760150211,
-      "test_ece": 0.18191388137710884
+      "test_mean_brier": 0.650997276015021,
+      "test_ece": 0.18191388137710887
     },
     {
       "strategy": "random",
       "round": 14,
       "n_labels": 100,
       "test_accuracy": 0.558,
-      "test_mean_brier": 0.6507090845339467,
+      "test_mean_brier": 0.6507090845339468,
       "test_ece": 0.1697375487721799
     },
     {
@@ -138,23 +138,23 @@
       "round": 15,
       "n_labels": 105,
       "test_accuracy": 0.56,
-      "test_mean_brier": 0.6483000094700712,
-      "test_ece": 0.18104832226418754
+      "test_mean_brier": 0.6483000094700706,
+      "test_ece": 0.1810483222641876
     },
     {
       "strategy": "uncertainty",
       "round": 0,
       "n_labels": 30,
       "test_accuracy": 0.5,
-      "test_mean_brier": 0.6858421178792917,
-      "test_ece": 0.19813899975105193
+      "test_mean_brier": 0.6858421178792916,
+      "test_ece": 0.19813899975105198
     },
     {
       "strategy": "uncertainty",
       "round": 1,
       "n_labels": 35,
       "test_accuracy": 0.526,
-      "test_mean_brier": 0.6821064932043256,
+      "test_mean_brier": 0.6821064932043261,
       "test_ece": 0.2035979077945516
     },
     {
@@ -162,24 +162,24 @@
       "round": 2,
       "n_labels": 40,
       "test_accuracy": 0.536,
-      "test_mean_brier": 0.6618759552847688,
-      "test_ece": 0.20692934820960063
+      "test_mean_brier": 0.6618759552847686,
+      "test_ece": 0.2069293482096006
     },
     {
       "strategy": "uncertainty",
       "round": 3,
       "n_labels": 45,
       "test_accuracy": 0.538,
-      "test_mean_brier": 0.6653159022147777,
-      "test_ece": 0.2147507244405432
+      "test_mean_brier": 0.6653159022147779,
+      "test_ece": 0.21475072444054308
     },
     {
       "strategy": "uncertainty",
       "round": 4,
       "n_labels": 50,
       "test_accuracy": 0.544,
-      "test_mean_brier": 0.6827277579854909,
-      "test_ece": 0.2303163122986674
+      "test_mean_brier": 0.6827277579854916,
+      "test_ece": 0.23031631229866747
     },
     {
       "strategy": "uncertainty",
@@ -187,22 +187,22 @@
       "n_labels": 55,
       "test_accuracy": 0.554,
       "test_mean_brier": 0.6934764978049769,
-      "test_ece": 0.25885440313095603
+      "test_ece": 0.2588544031309561
     },
     {
       "strategy": "uncertainty",
       "round": 6,
       "n_labels": 60,
       "test_accuracy": 0.558,
-      "test_mean_brier": 0.6864690568268667,
-      "test_ece": 0.23435000144137902
+      "test_mean_brier": 0.6864690568268677,
+      "test_ece": 0.23435000144137905
     },
     {
       "strategy": "uncertainty",
       "round": 7,
       "n_labels": 65,
       "test_accuracy": 0.568,
-      "test_mean_brier": 0.6788205899743741,
+      "test_mean_brier": 0.678820589974374,
       "test_ece": 0.2314698922135981
     },
     {
@@ -210,32 +210,32 @@
       "round": 8,
       "n_labels": 70,
       "test_accuracy": 0.572,
-      "test_mean_brier": 0.6686005957587815,
-      "test_ece": 0.2372485398214557
+      "test_mean_brier": 0.668600595758782,
+      "test_ece": 0.23724853982145566
     },
     {
       "strategy": "uncertainty",
       "round": 9,
       "n_labels": 75,
       "test_accuracy": 0.58,
-      "test_mean_brier": 0.6630539134898554,
-      "test_ece": 0.2308765636801974
+      "test_mean_brier": 0.6630539134898558,
+      "test_ece": 0.23087656368019738
     },
     {
       "strategy": "uncertainty",
       "round": 10,
       "n_labels": 80,
       "test_accuracy": 0.586,
-      "test_mean_brier": 0.6659061978611123,
-      "test_ece": 0.24171799072583627
+      "test_mean_brier": 0.6659061978611125,
+      "test_ece": 0.2417179907258362
     },
     {
       "strategy": "uncertainty",
       "round": 11,
       "n_labels": 85,
       "test_accuracy": 0.57,
-      "test_mean_brier": 0.6851122485900796,
-      "test_ece": 0.2528149875630253
+      "test_mean_brier": 0.6851122485900795,
+      "test_ece": 0.2528149875630256
     },
     {
       "strategy": "uncertainty",
@@ -243,7 +243,7 @@
       "n_labels": 90,
       "test_accuracy": 0.586,
       "test_mean_brier": 0.6686902145823147,
-      "test_ece": 0.23641857117489545
+      "test_ece": 0.23641857117489562
     },
     {
       "strategy": "uncertainty",
@@ -258,16 +258,16 @@
       "round": 14,
       "n_labels": 100,
       "test_accuracy": 0.602,
-      "test_mean_brier": 0.638699095097672,
-      "test_ece": 0.2186801708973501
+      "test_mean_brier": 0.6386990950976719,
+      "test_ece": 0.21868017089735026
     },
     {
       "strategy": "uncertainty",
       "round": 15,
       "n_labels": 105,
       "test_accuracy": 0.606,
-      "test_mean_brier": 0.6302132916265485,
-      "test_ece": 0.21455035785902524
+      "test_mean_brier": 0.6302132916265486,
+      "test_ece": 0.21455035785902538
     }
   ]
 }

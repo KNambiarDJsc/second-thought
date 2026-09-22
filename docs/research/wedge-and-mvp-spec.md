@@ -71,11 +71,42 @@ negative result:** tried five things to fix it, none of which held up as a gener
    negative result, not shipped as a strategy, specifically because it looked like a fix on the
    first seed tried and stopping there would have been a cherry-picked, non-reproducible claim.
 
+**Second follow-up investigation (2026-09-22, same day, continued rather than treated as closed):**
+all five attempts above kept the shipped `_diversify()` algorithm (greedy farthest-first traversal
+seeded from the single highest-uncertainty candidate) and only varied what embedding fed into it.
+A sixth attempt changed the *algorithm* instead: k-means clustering (k = budget) over the
+shortlist's `decision_function` embedding — attempt 4's best-performing embedding — picking the
+single highest-uncertainty member of each cluster, instead of farthest-first traversal. Motivation:
+farthest-first always seeds from the most extreme uncertain point and walks outward from there,
+which can still stay within one region of decision-boundary space; clustering partitions the
+shortlist into `budget` regions up front, which is a structurally different way to force spread.
+
+Tested against the same harder config and the same three seeds (1, 7, 42), `budget_per_round=15`:
+
+| seed | random | uncertainty (no diversify) | cluster-diversify | beats random? |
+|---|---|---|---|---|
+| 1 | 0.4540 | 0.4120 | 0.4240 | No |
+| 7 | 0.3380 | 0.3700 | 0.3680 | Yes |
+| 42 | 0.3780 | 0.3980 | 0.3820 | Yes |
+
+Beats random on 2 of 3 seeds, loses on seed 1 — **does not close the gap robustly either**, for the
+same reason the epsilon-greedy hybrid was rejected: a fix that wins on most seeds tried but loses on
+one isn't a general fix, it's noise dressed as one. Not shipped as the default, and not added as a
+new `Strategy` — this is a negative result, recorded so the next person doesn't re-run this specific
+idea (a fundamentally different diversification algorithm, not just a new embedding) from scratch
+either. The exact reproduction script is not checked in (it lived in a scratch investigation, not
+`examples/`), but the method is fully specified above: it's a ~15-line change to `_diversify()`
+(swap the farthest-first loop for `sklearn.cluster.KMeans(n_clusters=budget)` on the shortlist,
+then pick the top-scored candidate per cluster) plus threading a `decision_function`-based embed
+function through in place of raw features — reproducible from that description alone.
+
 **Conclusion: large-batch degradation of uncertainty sampling remains an open problem on this
-benchmark.** None of the standard mitigations tried closed the gap robustly. This is documented
-here instead of quietly dropped so the next person doesn't re-run the same five ideas from scratch.
-The practical guidance stands: keep `budget_per_round` small relative to the labeled set (where
-uncertainty selection reliably wins, per the headline result above), or review one at a time.
+benchmark**, now after six mitigation attempts (five embedding variants of farthest-first, one
+structurally different clustering algorithm) rather than five. None closed the gap robustly. This
+is documented here instead of quietly dropped so the next person doesn't re-run the same six ideas
+from scratch. The practical guidance stands: keep `budget_per_round` small relative to the labeled
+set (where uncertainty selection reliably wins, per the headline result above), or review one at a
+time.
 
 **Why synthetic data, not real Laya fine-tuning:** reproducing this at Laya's actual scale needs a
 GPU, a labeled production-shaped dataset, and enough wall-clock time for several fine-tuning

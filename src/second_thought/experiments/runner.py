@@ -14,12 +14,23 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
-
-import numpy as np
+from typing import TYPE_CHECKING
 
 from second_thought.evaluation import evaluate
 from second_thought.schema import Correction, DecisionEvent, Prediction, QuestionSpec, QuestionType
 from second_thought.selection import Strategy, select
+
+if TYPE_CHECKING:
+    # Every reference to `np` in this module is a type annotation (parameter,
+    # return, or local-variable), never evaluated at runtime because of the
+    # `from __future__ import annotations` above — so this module has no
+    # actual runtime dependency on numpy being installed; it only operates on
+    # whatever ndarray-like objects a caller (which does depend on numpy,
+    # e.g. via scikit-learn) passes in. Keeping the import real-but-deferred
+    # here, rather than dropping it, keeps mypy/IDE type-checking exact. See
+    # the `experiments` extra in pyproject.toml for what running an actual
+    # experiment (as opposed to just importing this module) requires.
+    import numpy as np
 
 QUESTION_ID = "label"
 
@@ -79,8 +90,14 @@ def run_experiment(
     strategies: Sequence[Strategy] = (Strategy.RANDOM, Strategy.UNCERTAINTY),
     diversify: bool = False,
 ) -> list[RoundResult]:
-    from sklearn.linear_model import LogisticRegression
-    from sklearn.model_selection import train_test_split
+    try:
+        from sklearn.linear_model import LogisticRegression
+        from sklearn.model_selection import train_test_split
+    except ImportError as exc:
+        raise ImportError(
+            "run_experiment() needs scikit-learn (and numpy, installed with it). "
+            "Install with `pip install second-thought[experiments]`."
+        ) from exc
 
     results: list[RoundResult] = []
     features_by_id: dict[str, np.ndarray] = {str(i): x_pool[i] for i in range(len(x_pool))}

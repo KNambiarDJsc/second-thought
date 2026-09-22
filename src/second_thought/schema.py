@@ -9,14 +9,68 @@ derived ``confidence`` scalar. This is not a generic "LLM trace" schema.
 
 from __future__ import annotations
 
+import json
 import time
 import uuid
+from collections.abc import Callable
 from enum import Enum
 from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
 
 SCHEMA_VERSION = "1.0"
+
+# Forward migrations for the stored JSON record shape, keyed by the
+# `schema_version` they migrate *from*. `SCHEMA_VERSION` has no entry here
+# because nothing needs to migrate away from the current version -- this
+# registry only exists to have somewhere real to put the *next* one, so a
+# future schema_version bump doesn't leave every previously-captured row
+# permanently unreadable via a bare ValidationError. See
+# `DecisionEvent.from_stored_json` and `register_migration`.
+_RECORD_MIGRATIONS: dict[str, Callable[[dict[str, Any]], dict[str, Any]]] = {}
+
+
+def register_migration(
+    from_version: str,
+) -> Callable[[Callable[[dict[str, Any]], dict[str, Any]]], Callable[[dict[str, Any]], dict[str, Any]]]:
+    """Register a function that upgrades a stored record's raw dict one step forward.
+
+    ``fn`` receives the record as a plain dict shaped like ``from_version``
+    and must return a dict shaped like the next version (setting its own
+    ``schema_version`` key). Migrations chain automatically: registering
+    "1.0" -> "1.1" and "1.1" -> "1.2" lets a "1.0" record migrate all the way
+    to "1.2" in one ``from_stored_json`` call.
+    """
+
+    def _decorator(
+        fn: Callable[[dict[str, Any]], dict[str, Any]],
+    ) -> Callable[[dict[str, Any]], dict[str, Any]]:
+        _RECORD_MIGRATIONS[from_version] = fn
+        return fn
+
+    return _decorator
+
+
+def _migrate_record(raw: dict[str, Any]) -> dict[str, Any]:
+    seen: set[str] = set()
+    while raw.get("schema_version") != SCHEMA_VERSION:
+        version = raw.get("schema_version")
+        if not isinstance(version, str):
+            raise TypeError(
+                f"stored record has no valid schema_version to migrate from: {version!r}"
+            )
+        if version in seen:
+            raise RuntimeError(f"migration cycle detected at schema_version {version!r}")
+        migration = _RECORD_MIGRATIONS.get(version)
+        if migration is None:
+            raise ValueError(
+                f"no migration registered from schema_version {version!r} to "
+                f"{SCHEMA_VERSION!r} -- a decision event stored under an older schema "
+                "can't be read back until one is added via @register_migration"
+            )
+        seen.add(version)
+        raw = migration(raw)
+    return raw
 
 
 class QuestionType(str, Enum):
@@ -124,3 +178,18 @@ class DecisionEvent(BaseModel):
 
     def to_jsonl_record(self) -> str:
         return self.model_dump_json()
+
+    @classmethod
+    def from_stored_json(cls, data: str) -> DecisionEvent:
+        """Deserialize a record from storage, migrating it forward first if it's stale.
+
+        Storage (``Store``) and dataset export both read records back
+        through this instead of ``model_validate_json`` directly, so a
+        record captured under an older ``schema_version`` doesn't hard-fail
+        with a ``ValidationError`` the moment the schema moves on -- it's
+        migrated via ``_RECORD_MIGRATIONS`` first.
+        """
+        raw = json.loads(data)
+        if raw.get("schema_version") != SCHEMA_VERSION:
+            raw = _migrate_record(raw)
+        return cls.model_validate(raw)

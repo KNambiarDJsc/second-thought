@@ -57,23 +57,38 @@ def capture(
     ``second_thought.capture()`` directly from your inference code instead.
     """
     n = 0
+    failures: list[tuple[int, str]] = []
     with _store(db) as store:
-        for line in Path(responses_jsonl).read_text(encoding="utf-8").splitlines():
+        for lineno, line in enumerate(
+            Path(responses_jsonl).read_text(encoding="utf-8").splitlines(), start=1
+        ):
             if not line.strip():
                 continue
             rec = json.loads(line)
-            capture_event(
-                store,
-                rec["raw"],
-                provider=rec["provider"],
-                state=rec["state"],
-                questions=rec["questions"],
-                workflow=rec.get("workflow"),
-                model_version=rec.get("model_version"),
-                latency_ms=rec.get("latency_ms"),
-            )
-            n += 1
+            try:
+                # strict=True: a backfill is offline, human-attended work — a
+                # malformed line should be reported, not silently dropped the
+                # way a live inference-path capture() call would (default
+                # strict=False there; see second_thought.capture).
+                capture_event(
+                    store,
+                    rec["raw"],
+                    provider=rec["provider"],
+                    state=rec["state"],
+                    questions=rec["questions"],
+                    workflow=rec.get("workflow"),
+                    model_version=rec.get("model_version"),
+                    latency_ms=rec.get("latency_ms"),
+                    strict=True,
+                )
+                n += 1
+            except Exception as exc:  # noqa: BLE001 - reported per line, not swallowed
+                failures.append((lineno, str(exc)))
     console.print(f"[green]Captured[/green] {n} decision events into {db}")
+    if failures:
+        console.print(f"[red]Skipped {len(failures)} malformed line(s)[/red]")
+        for lineno, message in failures:
+            console.print(f"  line {lineno}: {message}")
 
 
 @app.command()

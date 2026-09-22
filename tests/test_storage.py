@@ -1,3 +1,4 @@
+import sqlite3
 import threading
 
 import pytest
@@ -5,6 +6,7 @@ import pytest
 from second_thought.correction import correct
 from second_thought.schema import DecisionEvent, Prediction, QuestionSpec, QuestionType
 from second_thought.storage import Store
+from second_thought.storage.sqlite_store import _DB_MIGRATIONS
 
 
 def _event(event_id: str, provider: str, workflow: str) -> DecisionEvent:
@@ -106,3 +108,22 @@ def test_apply_is_atomic_under_concurrent_threads(tmp_path):
     assert event is not None
     assert len(event.corrections) == n
     store.close()
+
+
+def test_db_user_version_is_set_and_reopening_is_idempotent(tmp_path):
+    db_path = tmp_path / "s.db"
+    with Store(db_path) as store:
+        store.add(_event("e1", "laya", "moderation"))
+
+    conn = sqlite3.connect(db_path)
+    (version,) = conn.execute("PRAGMA user_version").fetchone()
+    conn.close()
+    assert version == len(_DB_MIGRATIONS)
+    assert version > 0
+
+    # Reopening an already-migrated db must not error or lose data --
+    # _DB_MIGRATIONS[current:] should be empty and no-op.
+    with Store(db_path) as store:
+        assert store.get("e1") is not None
+        (reopened_version,) = store._conn.execute("PRAGMA user_version").fetchone()
+        assert reopened_version == version

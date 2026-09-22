@@ -14,6 +14,14 @@ review process. A single ``sqlite3.Connection`` is not safe for concurrent
 use from multiple threads, so every method here serializes access through
 ``self._lock``; WAL mode + a ``busy_timeout`` handle the equivalent problem
 across separate *processes* sharing the same database file.
+
+Migrations: this table's own structure (columns/indexes) is versioned via
+``PRAGMA user_version`` and ``_DB_MIGRATIONS`` below -- distinct from
+``DecisionEvent.schema_version``, which versions the JSON payload stored in
+the ``record`` column and is migrated on read via ``DecisionEvent.
+from_stored_json`` (see ``second_thought.schema``). Two different things can
+each change independently: the SQL table shape, and the record shape stored
+inside it.
 """
 
 from __future__ import annotations
@@ -49,6 +57,32 @@ _UPSERT_SQL = (
 # How long a connection waits on SQLite's write lock before raising
 # "database is locked", when a second *process* (not just thread) holds it.
 _BUSY_TIMEOUT_MS = 5000
+
+# Ordered SQL migrations for the table/index structure itself, tracked via
+# SQLite's own `PRAGMA user_version` (separate from `DecisionEvent.
+# schema_version`, which versions the JSON payload in the `record` column,
+# not this table's columns/indexes). Each step must be safe to run against
+# whatever a prior version of this file already created -- `_SCHEMA`'s own
+# `IF NOT EXISTS` covers step 0 for both a brand-new db and one that
+# predates this migration mechanism. Append new steps here (e.g. an `ALTER
+# TABLE ... ADD COLUMN`) rather than editing an already-shipped one.
+def _migration_0_initial_schema(conn: sqlite3.Connection) -> None:
+    conn.executescript(_SCHEMA)
+
+
+_DB_MIGRATIONS: list[Callable[[sqlite3.Connection], None]] = [
+    _migration_0_initial_schema,
+]
+
+
+def _migrate_db(conn: sqlite3.Connection) -> None:
+    (current,) = conn.execute("PRAGMA user_version").fetchone()
+    for step in _DB_MIGRATIONS[current:]:
+        step(conn)
+    target = len(_DB_MIGRATIONS)
+    if current < target:
+        conn.execute(f"PRAGMA user_version = {target}")
+    conn.commit()
 
 
 def _row(event: DecisionEvent) -> tuple[str, str, str | None, float, int, str]:
@@ -99,8 +133,7 @@ class Store:
         self._conn = sqlite3.connect(self.path, check_same_thread=False)
         self._conn.execute("PRAGMA journal_mode=WAL")
         self._conn.execute(f"PRAGMA busy_timeout={_BUSY_TIMEOUT_MS}")
-        self._conn.executescript(_SCHEMA)
-        self._conn.commit()
+        _migrate_db(self._conn)
 
     def close(self) -> None:
         with self._lock:
@@ -122,7 +155,7 @@ class Store:
             row = self._conn.execute(
                 "SELECT record FROM decision_events WHERE id = ?", (event_id,)
             ).fetchone()
-        return DecisionEvent.model_validate_json(row[0]) if row else None
+        return DecisionEvent.from_stored_json(row[0]) if row else None
 
     def apply(
         self, event_id: str, mutator: Callable[[DecisionEvent], None]
@@ -147,7 +180,7 @@ class Store:
                 ).fetchone()
                 if row is None:
                     raise KeyError(f"no decision event with id {event_id!r}")
-                event = DecisionEvent.model_validate_json(row[0])
+                event = DecisionEvent.from_stored_json(row[0])
                 mutator(event)
                 self._conn.execute(_UPSERT_SQL, _row(event))
             except BaseException:
@@ -178,7 +211,7 @@ class Store:
             # each event, including calling back into the Store.
             rows = self._conn.execute(sql, params).fetchall()
         for (record,) in rows:
-            yield DecisionEvent.model_validate_json(record)
+            yield DecisionEvent.from_stored_json(record)
 
     def count(
         self,
