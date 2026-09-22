@@ -22,9 +22,14 @@ def accept(
     """The reviewer agrees with the model. Still recorded as a correction (source='accept')
 
     so it counts toward the correction dataset's coverage of reviewed decisions."""
-    event = _load(store, event_id)
-    value = predicted_value(event.predictions[question_id])
-    return _apply(store, event, question_id, value, source="accept", reviewer=reviewer)
+
+    def _mutate(event: DecisionEvent) -> None:
+        _record_correction(
+            event, question_id, predicted_value(_prediction(event, question_id)),
+            source="accept", reviewer=reviewer,
+        )
+
+    return store.apply(event_id, _mutate)
 
 
 def correct(
@@ -37,10 +42,14 @@ def correct(
     note: str | None = None,
 ) -> DecisionEvent:
     """The reviewer overrides the model's answer."""
-    event = _load(store, event_id)
-    return _apply(
-        store, event, question_id, value, source="human_correction", reviewer=reviewer, note=note
-    )
+
+    def _mutate(event: DecisionEvent) -> None:
+        _prediction(event, question_id)  # validates question_id exists
+        _record_correction(
+            event, question_id, value, source="human_correction", reviewer=reviewer, note=note
+        )
+
+    return store.apply(event_id, _mutate)
 
 
 def abstain(
@@ -58,14 +67,15 @@ def abstain(
     label. It's still excluded from future selection so it doesn't keep
     resurfacing.
     """
-    event = _load(store, event_id)
-    abstained = event.metadata.setdefault("abstained_questions", [])
-    if question_id not in abstained:
-        abstained.append(question_id)
-    if note:
-        event.metadata.setdefault("notes", {})[question_id] = note
-    store.add(event)
-    return event
+
+    def _mutate(event: DecisionEvent) -> None:
+        abstained = event.metadata.setdefault("abstained_questions", [])
+        if question_id not in abstained:
+            abstained.append(question_id)
+        if note:
+            event.metadata.setdefault("notes", {})[question_id] = note
+
+    return store.apply(event_id, _mutate)
 
 
 def flag(
@@ -76,22 +86,21 @@ def flag(
     Unlike ``abstain``, a flagged item is NOT excluded from future selection —
     the point is to surface it for someone else to look at, not to drop it.
     """
-    event = _load(store, event_id)
-    flagged = event.metadata.setdefault("flagged_questions", {})
-    flagged[question_id] = {"note": note, "reviewer": reviewer}
-    store.add(event)
-    return event
+
+    def _mutate(event: DecisionEvent) -> None:
+        flagged = event.metadata.setdefault("flagged_questions", {})
+        flagged[question_id] = {"note": note, "reviewer": reviewer}
+
+    return store.apply(event_id, _mutate)
 
 
-def _load(store: Store, event_id: str) -> DecisionEvent:
-    event = store.get(event_id)
-    if event is None:
-        raise KeyError(f"no decision event with id {event_id!r}")
-    return event
+def _prediction(event: DecisionEvent, question_id: str) -> Prediction:
+    if question_id not in event.predictions:
+        raise KeyError(f"event {event.id!r} has no question {question_id!r}")
+    return event.predictions[question_id]
 
 
-def _apply(
-    store: Store,
+def _record_correction(
     event: DecisionEvent,
     question_id: str,
     value: object,
@@ -99,11 +108,7 @@ def _apply(
     source: str,
     reviewer: str | None,
     note: str | None = None,
-) -> DecisionEvent:
-    if question_id not in event.predictions:
-        raise KeyError(f"event {event.id!r} has no question {question_id!r}")
+) -> None:
     event.corrections[question_id] = Correction(
         question_id=question_id, value=value, source=source, reviewer=reviewer, note=note
     )
-    store.add(event)
-    return event
