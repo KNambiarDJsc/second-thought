@@ -77,6 +77,18 @@ to reproduce the same loop against real Laya; running it is left to whoever has 
 - Not a Jev live-API client, and never a Jev training-data pipeline.
 - Not a web UI for v0 — the CLI (`secondthought review`, etc.) is the correction interface.
 
+## Correction: this was never architecturally Laya-specific, but read that way
+
+Early docs and the README led with "Laya-first," which overstated how coupled the SDK actually is
+to Laya. The core pipeline (`schema.py`, `capture.py`, `selection/`, `correction.py`,
+`datasets/`, `evaluation.py`) never imports Laya or assumes its response shape beyond the generic
+`{"model", "answers"}` envelope every inspected System One provider shares. What was missing was a
+*demonstrated* path for "bring your own model" — `adapters/custom.py`'s `FunctionProvider` and
+`examples/generic_provider/` (a plain TF-IDF + logistic regression text classifier, no Laya or Jev
+involved) now prove that concretely rather than asserting it. Laya remains the only provider this
+project fine-tunes end-to-end for one reason only — licensing (Apache-2.0, unlike Jev) — not
+because the SDK privileges it architecturally.
+
 ## MVP scope actually shipped
 
 Schema (`schema.py`, versioned, JSON-serializable) → SQLite storage → capture (provider-agnostic

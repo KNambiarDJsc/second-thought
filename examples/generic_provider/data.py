@@ -1,0 +1,48 @@
+"""A small, self-contained, real (not synthetic-vector) text dataset: support tickets
+triaged into billing / technical / account. No download — deterministic, offline."""
+
+from __future__ import annotations
+
+TICKETS: list[tuple[str, str]] = [
+    ("I was charged twice for my subscription this month, please refund the duplicate.", "billing"),
+    ("My invoice shows a $40 charge I don't recognize on this account.", "billing"),
+    ("Can you explain why my bill went up this cycle compared to last month?", "billing"),
+    ("I need a receipt for last month's payment for my expense report.", "billing"),
+    ("The credit card on file expired, how do I update my payment method?", "billing"),
+    ("I was promised a discount code at signup and it was never applied to my invoice.", "billing"),
+    ("Please cancel my auto-renewal, I don't want to be billed again next month.", "billing"),
+    ("There's a currency conversion fee on my statement that seems wrong.", "billing"),
+    ("I upgraded my plan but I'm still being charged the old price.", "billing"),
+    ("Refund request: the annual plan I bought doesn't match what was advertised.", "billing"),
+    ("The app crashes every time I try to upload a photo larger than 5MB.", "technical"),
+    ("I'm getting a 500 error when I try to log in from the mobile app.", "technical"),
+    ("Sync between the desktop and mobile client seems to have stopped working today.", "technical"),
+    ("The export button just spins forever and never downloads the file.", "technical"),
+    ("Push notifications stopped arriving after the last update.", "technical"),
+    ("The dashboard chart is showing incorrect data compared to the raw export.", "technical"),
+    ("API requests are timing out intermittently since this morning.", "technical"),
+    ("Dark mode makes some of the text unreadable on the settings page.", "technical"),
+    ("The search feature returns zero results even for terms I know exist.", "technical"),
+    ("Video calls keep dropping after about two minutes, every single time.", "technical"),
+    ("I forgot my password and the reset email never arrives.", "account"),
+    ("How do I merge two accounts that were created with different emails?", "account"),
+    ("I want to delete my account and all associated data permanently.", "account"),
+    ("Someone else seems to have access to my account, please help me secure it.", "account"),
+    ("I need to change the email address linked to my account.", "account"),
+    ("Two-factor authentication is locked me out and support hasn't responded.", "account"),
+    ("Can you transfer ownership of this workspace to a new admin?", "account"),
+    ("My account was suspended and I don't understand why.", "account"),
+    ("I need to add a teammate to my account with limited permissions.", "account"),
+    ("Please update the display name on my profile, it has a typo.", "account"),
+    ("Why was I charged for a seat I removed from my account last week?", "billing"),
+    ("The invoice PDF is corrupted and won't open in any reader.", "billing"),
+    ("I think there's a bug that double-counts usage on my billing dashboard.", "technical"),
+    ("Export to CSV includes a broken column that used to work fine.", "technical"),
+    ("My login session keeps expiring every five minutes, is this expected?", "account"),
+    ("I can't find where to update my billing address on the account page.", "account"),
+    ("The mobile app won't open at all since I updated my phone's OS.", "technical"),
+    ("I was billed in the wrong currency, everything is 10x too high.", "billing"),
+    ("Requesting account deletion under data protection rules.", "account"),
+    ("Notifications are duplicated, I get the same alert three times.", "technical"),
+]
+"""40 labeled examples, roughly balanced across the three categories."""

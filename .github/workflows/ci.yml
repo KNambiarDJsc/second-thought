@@ -37,3 +37,16 @@ jobs:
         run: pip install -e . scikit-learn numpy
       - name: Run the core hypothesis experiment
         run: python examples/toy_typed_decisions/run.py
+
+  generic-provider-example:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: pip install -e . scikit-learn numpy
+      - name: Run the non-Laya, non-Jev provider example
+        run: python run.py
+        working-directory: examples/generic_provider
