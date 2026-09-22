@@ -51,14 +51,31 @@ vs 0.606; seed 42: 0.556 vs 0.650 — uncertainty ahead every time).
 
 **This result is batch-size-dependent, and that's reported, not hidden.** With a larger
 `budget_per_round` (15, vs. the seed set of 30) on the same data, uncertainty selection did **not**
-beat random (0.436 vs 0.560 after 120 corrections). This matches published findings that naive
-uncertainty sampling in large batches queries redundantly near the current decision boundary
-instead of spreading out — a real limitation of the shipped strategy, not a bug. `select()`'s
-`diversify_with` farthest-first re-ranking is built for exactly this, but a quick test using raw
-feature vectors as the embedding function didn't fix it — diversifying on raw input features isn't
-the same as diversifying on task-relevant structure. Left as an open problem for whoever picks this
-up next, with the practical guidance in the meantime: keep `budget_per_round` small relative to the
-labeled set, or review one at a time.
+beat random (0.392–0.436 vs. random's 0.436 across variants, seed 7). This matches published
+findings that naive uncertainty sampling in large batches queries redundantly near the current
+decision boundary instead of spreading out — a real limitation of the shipped strategy, not a bug.
+
+**Follow-up investigation (2026-09-22), reported in full rather than stopping at the first
+negative result:** tried five things to fix it, none of which held up as a general fix:
+
+1. `diversify_with` using raw pool features — didn't help (0.386 final, still below random).
+2. `diversify_with` using standardized features — small improvement (0.412), still below random.
+3. `diversify_with` using a 5-component PCA embedding — similar (0.414), still below random.
+4. `diversify_with` using the classifier's own `decision_function` output as a pseudo-embedding
+   (closer to "task-relevant structure" than raw features) — best of the diversification attempts
+   (0.418), **still below random's 0.436**.
+5. An epsilon-greedy hybrid (mixing a fixed fraction of random picks into each uncertainty batch)
+   looked promising on the original seed — 25% random + 75% uncertainty reached 0.462, beating both
+   pure strategies — but **did not replicate** on two other data seeds (seed 1: hybrid 0.524 vs.
+   random 0.568, hybrid loses; seed 42: hybrid 0.440 vs. random 0.458, hybrid loses). Reported as a
+   negative result, not shipped as a strategy, specifically because it looked like a fix on the
+   first seed tried and stopping there would have been a cherry-picked, non-reproducible claim.
+
+**Conclusion: large-batch degradation of uncertainty sampling remains an open problem on this
+benchmark.** None of the standard mitigations tried closed the gap robustly. This is documented
+here instead of quietly dropped so the next person doesn't re-run the same five ideas from scratch.
+The practical guidance stands: keep `budget_per_round` small relative to the labeled set (where
+uncertainty selection reliably wins, per the headline result above), or review one at a time.
 
 **Why synthetic data, not real Laya fine-tuning:** reproducing this at Laya's actual scale needs a
 GPU, a labeled production-shaped dataset, and enough wall-clock time for several fine-tuning
