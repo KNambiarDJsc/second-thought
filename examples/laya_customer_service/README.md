@@ -1,9 +1,15 @@
 # Reproducing the core loop against real Laya
 
-This has **not been run** as part of building this repository — there was no GPU in the
-environment it was built in. What follows is a precise, reproducible recipe, not a claim that it's
-been verified end-to-end. If you run it, please open a PR with `results/report.md` from a real run
-(random seed, hardware, and Laya version included) rather than hand-edited numbers.
+**Steps 1–3 and 5 below have now been run for real** (2026-09-22, one RTX 4090, `laya==0.3.5`,
+`convaiinnovations/laya-typed-decisions`) — see [`results/report.md`](results/report.md) and the
+runnable script, [`run.py`](run.py). 87.5% accuracy on 24 live-inferred tickets; uncertainty-based
+`select()` caught 3/3 real mispredictions within the first third of the review queue; and a real,
+non-synthetic finding — the run's ECE (0.62) corroborates a load-time warning Laya itself emits
+about out-of-range calibration temperatures. Step 4, actual fine-tuning, is **not** covered by
+`run.py` and remains unexecuted: Laya ships no supported fine-tuning CLI, only a Kaggle notebook
+(see step 4 below), which isn't a turnkey automatable pod script the way steps 1–3+5 are. If you
+run step 4, please open a PR with the same rigor — real hardware, real Laya version, real numbers,
+not hand-edited ones — that `results/report.md` already follows.
 
 ## 1. Install
 

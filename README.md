@@ -90,6 +90,13 @@ v0.1.0. Three examples, each proving a different claim:
   uncertainty-selected tickets are wrong more often than an arbitrary sample
   — i.e. that selection is finding real learning value, not just noise.
 - `examples/laya_customer_service/` — documents how to reproduce the same
-  loop against real Laya at production scale; that run has not been
-  executed as part of building this repository (no GPU available) and its
-  README says so.
+  loop against real Laya, and now includes a real run of it (2026-09-22, one
+  RTX 4090, `laya==0.3.5`): 87.5% accuracy on 24 live-inferred tickets, and
+  uncertainty-based `select()` catching 3/3 real mispredictions within the
+  first third of the review queue. It also surfaced a real, non-synthetic
+  finding: Laya's own load-time warning about out-of-range calibration
+  temperatures is corroborated by this run's ECE (0.62) — high accuracy,
+  poorly calibrated probabilities. See `results/report.md` for the full
+  writeup. This is inference + the full SDK loop, not a fine-tuning run —
+  see that directory's README for why an actual fine-tune isn't a turnkey
+  automated script here (Laya ships no fine-tuning CLI, only a notebook).

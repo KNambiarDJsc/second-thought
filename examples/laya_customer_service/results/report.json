@@ -1,0 +1,365 @@
+{
+  "hardware": "NVIDIA GeForce RTX 4090 (RunPod, secure cloud, US-NC-1)",
+  "laya_package_version": "0.3.5",
+  "laya_checkpoint": "convaiinnovations/laya-typed-decisions",
+  "run_date": "2026-09-22",
+  "pod_cost_usd": 0.0114,
+  "n_tickets": 24,
+  "accuracy": 0.875,
+  "mean_brier": 0.2759240475,
+  "mean_log_loss": 0.5870071763971311,
+  "ece": 0.6162,
+  "mean_latency_ms": 34.3,
+  "min_latency_ms": 18.2,
+  "max_latency_ms": 396.6,
+  "model_load_seconds": 10.69,
+  "selection_budget": 8,
+  "total_mispredictions": 3,
+  "mispredictions_caught_by_selection": 3,
+  "export": {
+    "written_records": 24,
+    "split_counts": {
+      "train": 16,
+      "val": 3,
+      "test": 5
+    }
+  },
+  "rows": [
+    {
+      "text": "My order arrived broken, the screen is cracked. I want a replacement, not a refund.",
+      "laya_choice": "replace",
+      "laya_confidence": 0.238,
+      "laya_probabilities": {
+        "refund": 0.1339,
+        "replace": 0.6002,
+        "escalate": 0.216,
+        "ignore": 0.05
+      },
+      "ground_truth": "replace",
+      "correct": true,
+      "timestamp": 1790093644.1664805
+    },
+    {
+      "text": "This is the third time this month my package has been late. I'm done, give me my money back.",
+      "laya_choice": "refund",
+      "laya_confidence": 0.2931,
+      "laya_probabilities": {
+        "refund": 0.6242,
+        "replace": 0.0828,
+        "escalate": 0.2513,
+        "ignore": 0.0416
+      },
+      "ground_truth": "refund",
+      "correct": true,
+      "timestamp": 1790093644.187628
+    },
+    {
+      "text": "Your product literally set off sparks when I plugged it in. This is a fire hazard, I need this escalated immediately.",
+      "laya_choice": "escalate",
+      "laya_confidence": 0.4707,
+      "laya_probabilities": {
+        "refund": 0.0288,
+        "replace": 0.1864,
+        "escalate": 0.7545,
+        "ignore": 0.0303
+      },
+      "ground_truth": "escalate",
+      "correct": true,
+      "timestamp": 1790093644.2067556
+    },
+    {
+      "text": "hey just wanted to say thanks for the quick shipping!! no issues at all :)",
+      "laya_choice": "ignore",
+      "laya_confidence": 0.186,
+      "laya_probabilities": {
+        "refund": 0.0928,
+        "replace": 0.1697,
+        "escalate": 0.1573,
+        "ignore": 0.5802
+      },
+      "ground_truth": "ignore",
+      "correct": true,
+      "timestamp": 1790093644.2258773
+    },
+    {
+      "text": "I ordered a size medium but received a size small. Please send the correct size.",
+      "laya_choice": "replace",
+      "laya_confidence": 0.2096,
+      "laya_probabilities": {
+        "refund": 0.163,
+        "replace": 0.5718,
+        "escalate": 0.2152,
+        "ignore": 0.05
+      },
+      "ground_truth": "replace",
+      "correct": true,
+      "timestamp": 1790093644.2447596
+    },
+    {
+      "text": "I've been charged twice for the same order. Please refund the duplicate charge.",
+      "laya_choice": "refund",
+      "laya_confidence": 0.2388,
+      "laya_probabilities": {
+        "refund": 0.5967,
+        "replace": 0.1533,
+        "escalate": 0.208,
+        "ignore": 0.042
+      },
+      "ground_truth": "refund",
+      "correct": true,
+      "timestamp": 1790093644.2635672
+    },
+    {
+      "text": "Your customer service rep was incredibly rude to me on the phone yesterday. I want to speak to a manager.",
+      "laya_choice": "escalate",
+      "laya_confidence": 0.4269,
+      "laya_probabilities": {
+        "refund": 0.0549,
+        "replace": 0.0906,
+        "escalate": 0.7666,
+        "ignore": 0.0879
+      },
+      "ground_truth": "escalate",
+      "correct": true,
+      "timestamp": 1790093644.2830431
+    },
+    {
+      "text": "Just leaving a review, love the product, 5 stars!",
+      "laya_choice": "replace",
+      "laya_confidence": 0.0204,
+      "laya_probabilities": {
+        "refund": 0.1969,
+        "replace": 0.327,
+        "escalate": 0.2885,
+        "ignore": 0.1876
+      },
+      "ground_truth": "ignore",
+      "correct": false,
+      "timestamp": 1790093644.301969
+    },
+    {
+      "text": "The item I received doesn't match the description at all - I ordered blue and got red.",
+      "laya_choice": "refund",
+      "laya_confidence": 0.1533,
+      "laya_probabilities": {
+        "refund": 0.4253,
+        "replace": 0.353,
+        "escalate": 0.179,
+        "ignore": 0.0427
+      },
+      "ground_truth": "replace",
+      "correct": false,
+      "timestamp": 1790093644.3206832
+    },
+    {
+      "text": "I cancelled my subscription two weeks ago and you're still billing me. Refund immediately.",
+      "laya_choice": "refund",
+      "laya_confidence": 0.547,
+      "laya_probabilities": {
+        "refund": 0.8286,
+        "replace": 0.0529,
+        "escalate": 0.0911,
+        "ignore": 0.0274
+      },
+      "ground_truth": "refund",
+      "correct": true,
+      "timestamp": 1790093644.3393226
+    },
+    {
+      "text": "I'm a lawyer and I will be pursuing legal action if this data breach isn't addressed within 24 hours.",
+      "laya_choice": "escalate",
+      "laya_confidence": 0.3486,
+      "laya_probabilities": {
+        "refund": 0.0714,
+        "replace": 0.1804,
+        "escalate": 0.6963,
+        "ignore": 0.0519
+      },
+      "ground_truth": "escalate",
+      "correct": true,
+      "timestamp": 1790093644.3580246
+    },
+    {
+      "text": "No message, just an empty ticket submitted by accident.",
+      "laya_choice": "ignore",
+      "laya_confidence": 0.0361,
+      "laya_probabilities": {
+        "refund": 0.1561,
+        "replace": 0.1936,
+        "escalate": 0.2987,
+        "ignore": 0.3516
+      },
+      "ground_truth": "ignore",
+      "correct": true,
+      "timestamp": 1790093644.377109
+    },
+    {
+      "text": "The blender motor burned out after one use. It's clearly defective, I need a new one sent.",
+      "laya_choice": "replace",
+      "laya_confidence": 0.3842,
+      "laya_probabilities": {
+        "refund": 0.0827,
+        "replace": 0.7138,
+        "escalate": 0.1748,
+        "ignore": 0.0287
+      },
+      "ground_truth": "replace",
+      "correct": true,
+      "timestamp": 1790093644.3957672
+    },
+    {
+      "text": "I never received my order and tracking shows it was delivered to the wrong address. I want my money back.",
+      "laya_choice": "refund",
+      "laya_confidence": 0.3221,
+      "laya_probabilities": {
+        "refund": 0.6693,
+        "replace": 0.1055,
+        "escalate": 0.1897,
+        "ignore": 0.0354
+      },
+      "ground_truth": "refund",
+      "correct": true,
+      "timestamp": 1790093644.4143398
+    },
+    {
+      "text": "This is the fifth email I've sent with no response. I am extremely frustrated and considering a chargeback and a BBB complaint.",
+      "laya_choice": "escalate",
+      "laya_confidence": 0.1949,
+      "laya_probabilities": {
+        "refund": 0.1831,
+        "replace": 0.1414,
+        "escalate": 0.5863,
+        "ignore": 0.0893
+      },
+      "ground_truth": "escalate",
+      "correct": true,
+      "timestamp": 1790093644.4328542
+    },
+    {
+      "text": "Just confirming my address update went through, thanks!",
+      "laya_choice": "escalate",
+      "laya_confidence": 0.0208,
+      "laya_probabilities": {
+        "refund": 0.1607,
+        "replace": 0.2992,
+        "escalate": 0.3046,
+        "ignore": 0.2355
+      },
+      "ground_truth": "ignore",
+      "correct": false,
+      "timestamp": 1790093644.451413
+    },
+    {
+      "text": "The replacement part you sent last week doesn't fit either. This is the second wrong part in a row.",
+      "laya_choice": "replace",
+      "laya_confidence": 0.3836,
+      "laya_probabilities": {
+        "refund": 0.0625,
+        "replace": 0.7017,
+        "escalate": 0.2047,
+        "ignore": 0.0311
+      },
+      "ground_truth": "replace",
+      "correct": true,
+      "timestamp": 1790093644.4700286
+    },
+    {
+      "text": "I was overcharged shipping fees that weren't disclosed at checkout. Please refund the difference.",
+      "laya_choice": "refund",
+      "laya_confidence": 0.2077,
+      "laya_probabilities": {
+        "refund": 0.5638,
+        "replace": 0.1737,
+        "escalate": 0.2176,
+        "ignore": 0.0449
+      },
+      "ground_truth": "refund",
+      "correct": true,
+      "timestamp": 1790093644.488587
+    },
+    {
+      "text": "Your app crashed and deleted all my saved data with no backup option. I need this bumped to engineering right away.",
+      "laya_choice": "escalate",
+      "laya_confidence": 0.3431,
+      "laya_probabilities": {
+        "refund": 0.0754,
+        "replace": 0.1852,
+        "escalate": 0.6904,
+        "ignore": 0.049
+      },
+      "ground_truth": "escalate",
+      "correct": true,
+      "timestamp": 1790093644.50726
+    },
+    {
+      "text": "Quick question - do you ship to Canada? Not a complaint, just curious.",
+      "laya_choice": "ignore",
+      "laya_confidence": 0.1308,
+      "laya_probabilities": {
+        "refund": 0.1047,
+        "replace": 0.1506,
+        "escalate": 0.2348,
+        "ignore": 0.5099
+      },
+      "ground_truth": "ignore",
+      "correct": true,
+      "timestamp": 1790093644.5259943
+    },
+    {
+      "text": "The charger cable that came with my laptop is frayed and unsafe to use. Please send a working one.",
+      "laya_choice": "replace",
+      "laya_confidence": 0.4429,
+      "laya_probabilities": {
+        "refund": 0.0458,
+        "replace": 0.7562,
+        "escalate": 0.1583,
+        "ignore": 0.0397
+      },
+      "ground_truth": "replace",
+      "correct": true,
+      "timestamp": 1790093644.5450428
+    },
+    {
+      "text": "I was double-billed on my last invoice, this needs to be refunded this week.",
+      "laya_choice": "refund",
+      "laya_confidence": 0.2921,
+      "laya_probabilities": {
+        "refund": 0.6383,
+        "replace": 0.1216,
+        "escalate": 0.2072,
+        "ignore": 0.0329
+      },
+      "ground_truth": "refund",
+      "correct": true,
+      "timestamp": 1790093644.5638
+    },
+    {
+      "text": "Someone at your company posted my private information publicly. This needs to go to legal/security right now.",
+      "laya_choice": "escalate",
+      "laya_confidence": 0.1965,
+      "laya_probabilities": {
+        "refund": 0.1202,
+        "replace": 0.2146,
+        "escalate": 0.5783,
+        "ignore": 0.0869
+      },
+      "ground_truth": "escalate",
+      "correct": true,
+      "timestamp": 1790093644.5823762
+    },
+    {
+      "text": "Loved the unboxing experience, no issues to report.",
+      "laya_choice": "ignore",
+      "laya_confidence": 0.124,
+      "laya_probabilities": {
+        "refund": 0.1147,
+        "replace": 0.1877,
+        "escalate": 0.1824,
+        "ignore": 0.5152
+      },
+      "ground_truth": "ignore",
+      "correct": true,
+      "timestamp": 1790093644.600879
+    }
+  ]
+}
