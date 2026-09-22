@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.11", "3.13"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: pip install -e ".[dev]" scikit-learn numpy
+      - name: Ruff
+        run: ruff check src/ tests/ examples/
+      - name: Mypy
+        run: mypy src/second_thought
+      - name: Pytest
+        run: pytest -q
+
+  toy-experiment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: pip install -e . scikit-learn numpy
+      - name: Run the core hypothesis experiment
+        run: python examples/toy_typed_decisions/run.py
