@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Second Thought</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-0: #ffffff;
+    --surface-1: #fcfcfb;
+    --surface-2: #f2f1ee;
+    --border: #e3e2dd;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #86847d;
+    --series-1: #2a78d6;     /* sequential blue — the trend line */
+    --status-good: #0ca30c;
+    --status-critical: #d03b3b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --surface-0: #111110;
+      --surface-1: #1a1a19;
+      --surface-2: #232320;
+      --border: #33322e;
+      --text-primary: #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted: #8c8a80;
+      --series-1: #3987e5;
+      --status-good: #0ca30c;
+      --status-critical: #d03b3b;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-0: #111110; --surface-1: #1a1a19; --surface-2: #232320; --border: #33322e;
+    --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #8c8a80;
+    --series-1: #3987e5; --status-good: #0ca30c; --status-critical: #d03b3b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--surface-1); color: var(--text-primary);
+    font: 15px/1.5 -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  header {
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  header h1 { font-size: 17px; margin: 0; font-weight: 600; }
+  header .sub { color: var(--text-muted); font-size: 13px; }
+  nav { display: flex; gap: 4px; margin-left: auto; }
+  nav button {
+    background: none; border: 1px solid var(--border); color: var(--text-secondary);
+    padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px;
+  }
+  nav button.active { background: var(--series-1); color: white; border-color: var(--series-1); }
+  main { max-width: 980px; margin: 0 auto; padding: 20px; }
+  .view { display: none; }
+  .view.active { display: block; }
+  .filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+  .filters select, .filters input {
+    background: var(--surface-0); border: 1px solid var(--border); color: var(--text-primary);
+    padding: 6px 8px; border-radius: 6px; font-size: 13px;
+  }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .tile { background: var(--surface-0); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .tile .label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+  .tile .value { font-size: 24px; font-weight: 600; }
+  .card { background: var(--surface-0); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 20px; }
+  .card h2 { font-size: 14px; margin: 0 0 12px; color: var(--text-secondary); font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); }
+  th { color: var(--text-muted); font-weight: 500; }
+  .queue-item { background: var(--surface-0); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 10px; }
+  .queue-item .state { margin-bottom: 8px; }
+  .queue-item .meta { color: var(--text-muted); font-size: 12px; margin-bottom: 8px; }
+  .queue-item .predicted { font-size: 13px; margin-bottom: 10px; }
+  .queue-item .predicted b { color: var(--series-1); }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .actions button {
+    border: 1px solid var(--border); background: var(--surface-2); color: var(--text-primary);
+    padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 12px;
+  }
+  .actions button.accept { border-color: var(--status-good); color: var(--status-good); }
+  .actions input[type=text] {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 6px;
+    padding: 5px 8px; font-size: 12px; flex: 1; min-width: 120px;
+  }
+  .empty { color: var(--text-muted); padding: 24px 0; text-align: center; }
+  .legend { display: flex; gap: 16px; margin-top: 10px; font-size: 12px; color: var(--text-secondary); }
+  .legend .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+  #tooltip {
+    position: absolute; background: var(--text-primary); color: var(--surface-0);
+    padding: 6px 10px; border-radius: 6px; font-size: 12px; pointer-events: none;
+    opacity: 0; transition: opacity 0.1s; white-space: nowrap; z-index: 10;
+  }
+  .toggle-table { font-size: 12px; color: var(--series-1); background: none; border: none; cursor: pointer; padding: 0; margin-top: 8px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Second Thought</h1>
+  <span class="sub" id="db-path"></span>
+  <nav>
+    <button data-view="overview" class="active">Overview</button>
+    <button data-view="queue">Review queue</button>
+    <button data-view="drift">Calibration &amp; drift</button>
+  </nav>
+</header>
+<main>
+  <div class="filters">
+    <select id="f-workflow"><option value="">All workflows</option></select>
+    <select id="f-provider"><option value="">All providers</option></select>
+  </div>
+
+  <section id="view-overview" class="view active">
+    <div class="tiles" id="overview-tiles"></div>
+    <div class="card">
+      <h2>By workflow</h2>
+      <table id="by-workflow"><thead><tr><th>Workflow</th><th>Events</th></tr></thead><tbody></tbody></table>
+    </div>
+    <div class="card">
+      <h2>By provider</h2>
+      <table id="by-provider"><thead><tr><th>Provider</th><th>Events</th></tr></thead><tbody></tbody></table>
+    </div>
+  </section>
+
+  <section id="view-queue" class="view">
+    <div class="filters">
+      <select id="q-strategy">
+        <option value="uncertainty">uncertainty</option>
+        <option value="entropy">entropy</option>
+        <option value="margin">margin</option>
+        <option value="least_confidence">least_confidence</option>
+        <option value="random">random</option>
+      </select>
+      <input id="q-budget" type="number" value="20" min="1" style="width:70px" />
+      <button class="toggle-table" id="q-refresh">Refresh</button>
+    </div>
+    <div id="queue-list"></div>
+  </section>
+
+  <section id="view-drift" class="view">
+    <div class="filters">
+      <select id="d-metric">
+        <option value="ece">ECE (calibration error)</option>
+        <option value="mean_brier">mean Brier score</option>
+        <option value="mean_log_loss">mean log loss</option>
+        <option value="accuracy">accuracy</option>
+      </select>
+      <select id="d-bucket">
+        <option value="86400">daily buckets</option>
+        <option value="604800">weekly buckets</option>
+        <option value="3600">hourly buckets</option>
+      </select>
+    </div>
+    <div class="card">
+      <h2 id="drift-title">Calibration over time</h2>
+      <div style="position:relative">
+        <svg id="drift-svg" width="100%" height="260" viewBox="0 0 900 260" preserveAspectRatio="none"></svg>
+        <div id="tooltip"></div>
+      </div>
+      <div class="legend">
+        <span><span class="swatch" style="background:var(--status-good)"></span>in control</span>
+        <span><span class="swatch" style="background:var(--status-critical)"></span>&#9888; out of control</span>
+      </div>
+      <button class="toggle-table" id="drift-table-toggle">Show as table</button>
+      <table id="drift-table" style="display:none; margin-top:10px">
+        <thead><tr><th>Window start</th><th>n</th><th>value</th><th>status</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script>
+const API = "";
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
+
+function currentFilters() {
+  const workflow = $("#f-workflow").value;
+  const provider = $("#f-provider").value;
+  const params = new URLSearchParams();
+  if (workflow) params.set("workflow", workflow);
+  if (provider) params.set("provider", provider);
+  return params;
+}
+
+async function api(path, opts) {
+  const res = await fetch(API + path, opts);
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+// ---- nav ----
+$$("nav button").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    $$("nav button").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    $$(".view").forEach((v) => v.classList.remove("active"));
+    $("#view-" + btn.dataset.view).classList.add("active");
+    if (btn.dataset.view === "overview") loadOverview();
+    if (btn.dataset.view === "queue") loadQueue();
+    if (btn.dataset.view === "drift") loadDrift();
+  });
+});
+$("#f-workflow").addEventListener("change", () => { loadOverview(); });
+$("#f-provider").addEventListener("change", () => { loadOverview(); });
+
+// ---- overview ----
+function statTile(label, value) {
+  const el = document.createElement("div");
+  el.className = "tile";
+  const l = document.createElement("div"); l.className = "label"; l.textContent = label;
+  const v = document.createElement("div"); v.className = "value"; v.textContent = value;
+  el.append(l, v);
+  return el;
+}
+function fmtPct(x) { return x === null || x === undefined ? "—" : (x * 100).toFixed(1) + "%"; }
+function fmtNum(x, d = 3) { return x === null || x === undefined ? "—" : x.toFixed(d); }
+
+async function loadOverview() {
+  const data = await api("/api/summary?" + currentFilters());
+  const wfSel = $("#f-workflow"), pvSel = $("#f-provider");
+  const curWf = wfSel.value, curPv = pvSel.value;
+  wfSel.innerHTML = '<option value="">All workflows</option>' +
+    Object.keys(data.by_workflow).map((w) => `<option value="${w === "(none)" ? "" : w}">${w}</option>`).join("");
+  pvSel.innerHTML = '<option value="">All providers</option>' +
+    Object.keys(data.by_provider).map((p) => `<option value="${p}">${p}</option>`).join("");
+  wfSel.value = curWf; pvSel.value = curPv;
+
+  const tiles = $("#overview-tiles");
+  tiles.innerHTML = "";
+  tiles.append(
+    statTile("Total events", data.total_events),
+    statTile("Corrected", data.corrected_events),
+    statTile("Accuracy", fmtPct(data.evaluation.accuracy)),
+    statTile("Mean Brier", fmtNum(data.evaluation.mean_brier)),
+    statTile("ECE", fmtNum(data.evaluation.ece)),
+  );
+
+  const wfBody = $("#by-workflow tbody");
+  wfBody.innerHTML = Object.entries(data.by_workflow)
+    .map(([k, v]) => `<tr><td>${escapeHtml(k)}</td><td>${v}</td></tr>`).join("") ||
+    '<tr><td colspan="2" class="empty">No decisions captured yet</td></tr>';
+  const pvBody = $("#by-provider tbody");
+  pvBody.innerHTML = Object.entries(data.by_provider)
+    .map(([k, v]) => `<tr><td>${escapeHtml(k)}</td><td>${v}</td></tr>`).join("") ||
+    '<tr><td colspan="2" class="empty">No decisions captured yet</td></tr>';
+}
+
+function escapeHtml(s) {
+  const d = document.createElement("div");
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ---- queue ----
+async function loadQueue() {
+  const params = currentFilters();
+  params.set("strategy", $("#q-strategy").value);
+  params.set("budget", $("#q-budget").value || "20");
+  const items = await api("/api/queue?" + params);
+  const list = $("#queue-list");
+  if (!items.length) {
+    list.innerHTML = '<div class="empty">Nothing left to review — every captured decision is either corrected or below the selection budget.</div>';
+    return;
+  }
+  list.innerHTML = "";
+  for (const item of items) {
+    list.appendChild(renderQueueItem(item));
+  }
+}
+$("#q-refresh").addEventListener("click", loadQueue);
+
+function renderQueueItem(item) {
+  const el = document.createElement("div");
+  el.className = "queue-item";
+
+  const state = document.createElement("div");
+  state.className = "state";
+  state.textContent = item.input_state.length > 240 ? item.input_state.slice(0, 240) + "…" : item.input_state;
+
+  const meta = document.createElement("div");
+  meta.className = "meta";
+  meta.textContent = `${item.provider}${item.workflow ? " · " + item.workflow : ""} · score ${item.score?.toFixed(3) ?? "—"}`;
+
+  const predicted = document.createElement("div");
+  predicted.className = "predicted";
+  const answer = item.predicted_choice ?? item.predicted_score ?? item.predicted_noul;
+  predicted.innerHTML = `<b>${escapeHtml(item.instructions)}</b><br>model says: <b>${escapeHtml(String(answer))}</b>` +
+    (item.confidence !== null && item.confidence !== undefined ? ` (confidence ${item.confidence.toFixed(2)})` : "");
+
+  const actions = document.createElement("div");
+  actions.className = "actions";
+
+  const acceptBtn = document.createElement("button");
+  acceptBtn.className = "accept";
+  acceptBtn.textContent = "Accept";
+  acceptBtn.onclick = () => submitAction("/api/accept", { event_id: item.event_id, question_id: item.question_id }, el);
+
+  const correctInput = document.createElement("input");
+  correctInput.type = "text";
+  correctInput.placeholder = "Correct value…";
+
+  const correctBtn = document.createElement("button");
+  correctBtn.textContent = "Correct";
+  correctBtn.onclick = () => {
+    if (!correctInput.value) return;
+    submitAction("/api/correct", { event_id: item.event_id, question_id: item.question_id, value: correctInput.value }, el);
+  };
+
+  const abstainBtn = document.createElement("button");
+  abstainBtn.textContent = "Abstain";
+  abstainBtn.onclick = () => submitAction("/api/abstain", { event_id: item.event_id, question_id: item.question_id }, el);
+
+  actions.append(acceptBtn, correctInput, correctBtn, abstainBtn);
+  el.append(state, meta, predicted, actions);
+  return el;
+}
+
+async function submitAction(path, body, el) {
+  await api(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  el.style.opacity = "0.4";
+  el.style.pointerEvents = "none";
+}
+
+// ---- drift chart ----
+const METRIC_LABELS = {
+  ece: "ECE (calibration error)", mean_brier: "mean Brier score",
+  mean_log_loss: "mean log loss", accuracy: "accuracy",
+};
+$("#d-metric").addEventListener("change", loadDrift);
+$("#d-bucket").addEventListener("change", loadDrift);
+$("#drift-table-toggle").addEventListener("click", () => {
+  const t = $("#drift-table");
+  t.style.display = t.style.display === "none" ? "table" : "none";
+  $("#drift-table-toggle").textContent = t.style.display === "none" ? "Show as table" : "Hide table";
+});
+
+async function loadDrift() {
+  const metric = $("#d-metric").value;
+  const params = currentFilters();
+  params.set("metric", metric);
+  params.set("bucket_seconds", $("#d-bucket").value);
+  const data = await api("/api/drift?" + params);
+  $("#drift-title").textContent = METRIC_LABELS[metric] + " over time";
+  renderDriftChart(data);
+  renderDriftTable(data);
+}
+
+function renderDriftTable(data) {
+  const body = $("#drift-table tbody");
+  body.innerHTML = data.points.map((p) => `
+    <tr>
+      <td>${new Date(p.start * 1000).toLocaleString()}</td>
+      <td>${p.n}</td>
+      <td>${p.value.toFixed(4)}</td>
+      <td>${p.in_control ? "in control" : "⚠ out of control"}</td>
+    </tr>`).join("") || '<tr><td colspan="4" class="empty">Not enough corrected decisions yet to plot a trend (need more than the baseline window of buckets).</td></tr>';
+}
+
+function renderDriftChart(data) {
+  const svg = $("#drift-svg");
+  svg.innerHTML = "";
+  const W = 900, H = 260, PAD_L = 46, PAD_R = 16, PAD_T = 16, PAD_B = 30;
+  const points = data.points;
+  if (!points.length) {
+    const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    t.setAttribute("x", W / 2); t.setAttribute("y", H / 2); t.setAttribute("text-anchor", "middle");
+    t.setAttribute("fill", "var(--text-muted)"); t.setAttribute("font-size", "13");
+    t.textContent = "Not enough corrected decisions yet to plot a trend";
+    svg.appendChild(t);
+    return;
+  }
+
+  const values = points.map((p) => p.value);
+  const band = [data.control_center - data.control_limit, data.control_center + data.control_limit];
+  const yMin = Math.min(...values, band[0]);
+  const yMax = Math.max(...values, band[1]);
+  const yPad = (yMax - yMin || 1) * 0.15;
+  const y0 = yMin - yPad, y1 = yMax + yPad;
+
+  const x = (i) => PAD_L + (points.length === 1 ? 0.5 : i / (points.length - 1)) * (W - PAD_L - PAD_R);
+  const y = (v) => PAD_T + (1 - (v - y0) / (y1 - y0)) * (H - PAD_T - PAD_B);
+
+  const ns = "http://www.w3.org/2000/svg";
+  const g = (tag, attrs) => {
+    const el = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+    return el;
+  };
+
+  // gridlines (hairline, recessive)
+  for (let i = 0; i <= 4; i++) {
+    const gv = y0 + (i / 4) * (y1 - y0);
+    svg.appendChild(g("line", { x1: PAD_L, x2: W - PAD_R, y1: y(gv), y2: y(gv), stroke: "var(--border)", "stroke-width": 1 }));
+    const label = g("text", { x: PAD_L - 8, y: y(gv) + 4, "text-anchor": "end", "font-size": 11, fill: "var(--text-muted)" });
+    label.textContent = gv.toFixed(3);
+    svg.appendChild(label);
+  }
+
+  // control band (~10% opacity wash)
+  const bandPath = `M ${PAD_L} ${y(band[1])} L ${W - PAD_R} ${y(band[1])} L ${W - PAD_R} ${y(band[0])} L ${PAD_L} ${y(band[0])} Z`;
+  svg.appendChild(g("path", { d: bandPath, fill: "var(--series-1)", opacity: 0.08 }));
+  svg.appendChild(g("line", { x1: PAD_L, x2: W - PAD_R, y1: y(data.control_center), y2: y(data.control_center), stroke: "var(--series-1)", "stroke-width": 1, "stroke-dasharray": "3,3", opacity: 0.5 }));
+
+  // the line (2px, round join)
+  const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"} ${x(i)} ${y(p.value)}`).join(" ");
+  svg.appendChild(g("path", { d: linePath, fill: "none", stroke: "var(--series-1)", "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+
+  // markers, status-colored, with a 2px surface ring
+  points.forEach((p, i) => {
+    const color = p.in_control ? "var(--status-good)" : "var(--status-critical)";
+    svg.appendChild(g("circle", { cx: x(i), cy: y(p.value), r: 7, fill: "var(--surface-0)" }));
+    svg.appendChild(g("circle", { cx: x(i), cy: y(p.value), r: 5, fill: color }));
+  });
+
+  // crosshair + tooltip via a transparent hit layer
+  const tooltip = $("#tooltip");
+  const hit = g("rect", { x: PAD_L, y: PAD_T, width: W - PAD_L - PAD_R, height: H - PAD_T - PAD_B, fill: "transparent" });
+  const crosshair = g("line", { x1: 0, x2: 0, y1: PAD_T, y2: H - PAD_B, stroke: "var(--text-muted)", "stroke-width": 1, opacity: 0 });
+  svg.appendChild(crosshair);
+  svg.appendChild(hit);
+
+  hit.addEventListener("pointermove", (evt) => {
+    const rect = svg.getBoundingClientRect();
+    const px = ((evt.clientX - rect.left) / rect.width) * W;
+    let nearest = 0, best = Infinity;
+    points.forEach((p, i) => { const d = Math.abs(x(i) - px); if (d < best) { best = d; nearest = i; } });
+    const p = points[nearest];
+    crosshair.setAttribute("x1", x(nearest)); crosshair.setAttribute("x2", x(nearest)); crosshair.setAttribute("opacity", 1);
+    tooltip.style.opacity = 1;
+    tooltip.style.left = (x(nearest) / W) * 100 + "%";
+    tooltip.style.top = (y(p.value) / H) * 100 + "%";
+    tooltip.innerHTML = `<strong>${p.value.toFixed(4)}</strong> · ${p.n} decisions<br>${new Date(p.start * 1000).toLocaleDateString()} ${p.in_control ? "" : "· ⚠ out of control"}`;
+  });
+  hit.addEventListener("pointerleave", () => { crosshair.setAttribute("opacity", 0); tooltip.style.opacity = 0; });
+}
+
+loadOverview();
+</script>
+</body>
+</html>

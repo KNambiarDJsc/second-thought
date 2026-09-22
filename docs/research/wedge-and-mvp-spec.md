@@ -124,6 +124,11 @@ to reproduce the same loop against real Laya; running it is left to whoever has 
   faked).
 - Not a Jev live-API client, and never a Jev training-data pipeline.
 - Not a web UI for v0 — the CLI (`secondthought review`, etc.) is the correction interface.
+  **Revisited 2026-09-22**, past v0: `second_thought/dashboard/` (`secondthought serve`,
+  an optional extra) adds a local web UI over the same `Store`/`select`/`correct`
+  functions, alongside `drift.py` for continuous (not one-time) calibration monitoring.
+  Named and dated on purpose, not a silent reversal — see
+  `docs/research/decision-control-plane.md` for why v0's reasoning stopped applying.
 
 ## Correction: this was never architecturally Laya-specific, but read that way
 

@@ -19,6 +19,7 @@ from second_thought.correction import flag as do_flag
 from second_thought.correction import predicted_value
 from second_thought.datasets import export as export_dataset
 from second_thought.evaluation import evaluate as run_evaluation
+from second_thought.protocol import json_schema, validate_response
 from second_thought.schema import DecisionEvent
 from second_thought.selection import Strategy
 from second_thought.selection import select as select_candidates
@@ -203,6 +204,61 @@ def evaluate(
         events = list(store.query(provider=provider))
     report = run_evaluation(events, question_id=question)
     console.print(report)
+
+
+@app.command()
+def serve(
+    db: Annotated[str, typer.Option()] = DEFAULT_DB,
+    host: Annotated[str, typer.Option()] = "127.0.0.1",
+    port: Annotated[int, typer.Option()] = 8420,
+) -> None:
+    """Run the local review + calibration-drift dashboard (needs the `dashboard` extra)."""
+    try:
+        import uvicorn
+    except ImportError as exc:
+        console.print(
+            "[red]Missing the `dashboard` extra.[/red] Install with "
+            "`pip install second-thought[dashboard]`."
+        )
+        raise typer.Exit(code=1) from exc
+    from second_thought.dashboard.app import create_app
+
+    console.print(f"[green]Serving[/green] {db} at http://{host}:{port}")
+    uvicorn.run(create_app(db), host=host, port=port)
+
+
+protocol_app = typer.Typer(
+    help="Check whether a raw provider response is typed-decision-shaped — "
+    "usable standalone, no store or corrections needed."
+)
+app.add_typer(protocol_app, name="protocol")
+
+
+@protocol_app.command("validate")
+def protocol_validate(
+    response_json: Annotated[
+        str, typer.Argument(help="Path to a JSON file: one raw {model, answers, ...} response")
+    ],
+) -> None:
+    """Validate a raw provider response against the open typed-decision shape."""
+    raw = json.loads(Path(response_json).read_text(encoding="utf-8"))
+    result = validate_response(raw)
+    if result.ok:
+        console.print("[green]OK[/green] — conforms to the typed-decision response shape")
+    else:
+        console.print("[red]FAILED[/red]")
+        for error in result.errors:
+            console.print(f"  [red]error:[/red] {error}")
+    for warning in result.warnings:
+        console.print(f"  [yellow]warning:[/yellow] {warning}")
+    if not result.ok:
+        raise typer.Exit(code=1)
+
+
+@protocol_app.command("schema")
+def protocol_schema() -> None:
+    """Print the response envelope's JSON Schema."""
+    console.print_json(json.dumps(json_schema()))
 
 
 if __name__ == "__main__":
