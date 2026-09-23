@@ -4,6 +4,7 @@
 
 **Does your model's confidence number actually mean anything?**
 
+[![PyPI](https://img.shields.io/pypi/v/second-thought.svg)](https://pypi.org/project/second-thought/)
 [![CI](https://github.com/KNambiarDJsc/second-thought/actions/workflows/ci.yml/badge.svg)](https://github.com/KNambiarDJsc/second-thought/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](pyproject.toml)
@@ -51,7 +52,7 @@ project has actually tested against.
 ## Quickstart
 
 ```bash
-pip install -e ".[dev]"
+pip install second-thought
 ```
 
 ```python
@@ -72,7 +73,10 @@ export(list(store.query()), "dataset/")                    # fine-tune-ready, le
 
 Or skip Python entirely: `secondthought init | select | review | export | evaluate | serve`.
 
-*(Not on PyPI yet — install from source. [Release process →](docs/releasing.md))*
+Extras: `pip install "second-thought[laya]"` (the real Laya adapter), `[dashboard]` (`secondthought
+serve`), `[experiments]` (to run `examples/toy_typed_decisions`). Contributing to the SDK itself?
+`pip install -e ".[dev]"` from a clone pulls in everything at once — see
+[`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## The proof
 
@@ -147,8 +151,8 @@ not general tracing or prompt playgrounds. Full reasoning for each cut:
 
 ## Status
 
-**v0.1.0, alpha.** Real, tested, run against a real model — see [The proof](#the-proof). Not on
-PyPI yet. API may still move before v1.
+**v0.1.0, alpha, on PyPI.** Real, tested, run against a real model — see [The proof](#the-proof).
+API may still move before v1.
 
 ## Contributing
 
