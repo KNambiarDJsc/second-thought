@@ -49,6 +49,9 @@ Works with **any** model that returns a probability — Laya, a capture-only Jev
 own classifier in one line (`FunctionProvider`). Laya and Jev just happen to be the two this
 project has actually tested against.
 
+*Who this is for, and the longer bet on where this goes as the category matures:*
+[`docs/purpose-and-vision.md`](docs/purpose-and-vision.md).
+
 ## Quickstart
 
 ```bash
