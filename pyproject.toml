@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "second-thought"
 version = "0.1.0"
-description = "Learning infrastructure for typed probabilistic decisions from System One models (Laya, and typed-decision providers you bring yourself)."
+description = "Learning infrastructure for typed probabilistic decisions from any System One model: capture, calibration, uncertainty-based review, drift monitoring, and fine-tune-ready dataset export."
 readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.11"
