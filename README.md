@@ -11,9 +11,17 @@
 
 [Quickstart](#quickstart) · [Why](#why-second-thought) · [Dashboard](#a-local-dashboard-continuous-drift-monitoring-and-an-open-wire-spec) · [Proof, not claims](#proof-not-claims) · [Contributing](#contributing)
 
+<br>
+
+<img src="docs/assets/dashboard.jpg" alt="Second Thought's local review dashboard: a ticket the model is unsure about, its confidence, and one-click accept/correct" width="720">
+
+<sub>The local review queue (`secondthought serve`) — real screenshot, not a mockup. This ticket scored 0.890 on uncertainty; the model's own answer was only 48% confident.</sub>
+
 </div>
 
 ---
+
+> **A real run against live Laya found 87.5% accuracy paired with an ECE of 0.62 — high accuracy, badly calibrated probabilities, independently matching a load-time warning Laya itself emits.** That's the kind of gap this project exists to catch. [Full writeup →](examples/laya_customer_service/results/report.md)
 
 **System One models** are the new category of fast, non-autoregressive, calibrated decision
 models — TypeSafe's [Jev](https://typesafe.ai), open-weight alternatives like
